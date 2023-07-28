@@ -1,17 +1,94 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Jogo do Mario</title>
-  <link rel="stylesheet" href="style.css">
+
+  <link rel="stylesheet" href="./css/style.css">
+  <title>Document</title>
 </head>
 <body>
-  <div class="game">
-    <div class="mario"></div>
-    <div class="coin"></div>
+  <div class="game-board">
+    <img src="./images/clouds.png" class="clouds">
+    <img src="./images/pipe.png" class="pipe">
+    <img src="./images/mario.gif" class="mario">
+  </div>
+  <div class="game-over">
+    <img src="./images/gameover1.png" alt="Game Over" class="game-over-image">
+    <button class="restart-button" onclick="restartGame()">Restart</button>
   </div>
 
-  <script src="script.js"></script>
+  <script defer src="./js/script.js"></script>
 </body>
+<script> 
+const mario = document.querySelector('.mario');
+const pipe = document.querySelector('.pipe');
+const gameOverDiv = document.querySelector('.game-over');
+const restartButton = document.querySelector('.restart-button');
+let gameLoop = null;
+
+// Variáveis para controlar o salto do Mario
+let isJumping = false;
+let jumpTimeout = null;
+
+// Função para o salto do Mario
+const jump = () => {
+  mario.classList.add('jump');
+
+  setTimeout( () => {
+    mario.classList.remove('jump');
+  }, 500);
+}
+
+const checkCollision = setInterval( () => {
+  const pipePosition = pipe.offsetLeft;
+  const marioPosition = +window.getComputedStyle(mario).bottom.replace('px', '');
+
+  if (pipePosition <= 120 && pipePosition > 0 && marioPosition < 80) {
+    gameOver();
+
+    mario.src = './images/gameover.png';
+    mario.style.width = '75px';
+    mario.style.marginLeft = '50px';
+  }
+}, 10)
+
+const gameOver = () => {
+  clearInterval(gameLoop);
+  clearTimeout(jumpTimeout);
+  pipe.style.animation = 'none';
+  mario.style.animation = 'none';
+  
+  gameOverDiv.style.display = 'block';
+  isJumping = false;
+}
+
+const restartGame = () => {
+  gameOverDiv.style.display = 'none';
+  mario.src = './images/mario.gif';
+  mario.style.width = '150px';
+  mario.style.marginLeft = '0';
+  pipe.style.animation = 'pipe-animation 1.5s infinite linear';
+  mario.style.animation = 'none';
+  clearInterval(gameLoop);
+  gameLoop = setInterval(checkCollision, 10);
+  isJumping = false;
+}
+
+document.addEventListener('keydown', (event) => {
+  if (event.key === ' ') { // Verifica se a tecla pressionada é a barra de espaço
+    jump();
+  }
+});
+
+restartButton.addEventListener('click', restartGame);
+
+// Início do jogo
+gameLoop = setInterval(checkCollision, 10);
+</script>
+<br><br><br>
+<p>A TECLA ESPAÇO FAZ O MÁRIO PULAR. APÓS REINICIAR O JOGO, O CONTROLE NÃO FUNCIONA.</p> <br> <br>
+
+
+<p>O jogo precisa de uma alteração no reinicio de controles e de jogo. Quando reiniciado os controles param de funcionar. Em breve, atualização.</p>
 </html>
